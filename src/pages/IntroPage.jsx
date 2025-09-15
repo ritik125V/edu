@@ -40,6 +40,10 @@ function IntroPage() {
         >
           Login
         </Link>
+        <Link
+          to="/notification"
+          className="px-6 py-3 bg-white text-indigo-700 rounded-xl shadow-lg hover:bg-gray-100 font-semibold text-center transition"
+        >Notifications</Link>
       </div>
     </div>
   );
