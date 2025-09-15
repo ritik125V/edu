@@ -6,7 +6,7 @@ import LoginPage from './pages/LoginPage';
 import TeacherDashboard from './pages/TeacherDashboard';
 import IntroPage from './pages/IntroPage';
 import NotificationPage from './pages/Notification';
-
+import MarksPage from './pages/Marks';
 function App() {
   return (
     <BrowserRouter>
@@ -17,7 +17,7 @@ function App() {
         <Route path="/teacher-dashboard" element={< TeacherDashboard/>} />
         <Route path="/" element={< IntroPage/>} />
         <Route path="/notification" element={< NotificationPage/>} />
-
+        <Route path="/marks" element={< MarksPage/>} />
       </Routes>
     </BrowserRouter>
   );
