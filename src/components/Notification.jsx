@@ -5,9 +5,9 @@ function NotificationPage() {
   const notifications = [
     {
       id: 1,
-      title: "⏰ Timetable Update",
+      title: " Upcomming 🍆",
       message:
-        "Class 10-B timetable has been changed. Mathematics shifted to 11:00 AM - 11:45 AM.",
+        "Mathur k sath 🍆💦",
       time: "Today, 8:30 AM",
       type: "highlight",
     },
@@ -15,7 +15,7 @@ function NotificationPage() {
       id: 2,
       title: "📢 Upcoming Event",
       message:
-        "Annual Sports Day is scheduled for 20th Sept. All students must report by 8:00 AM.",
+        "Ground mai 💦🍆 .",
       time: "Yesterday, 5:00 PM",
       type: "normal",
     },

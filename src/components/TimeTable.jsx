@@ -116,9 +116,9 @@ function getUpdatedTimetable(classObj, day) {
         }
       }
       if (!foundSubstitute) {
-        finalTimetable[period].teacher = "Sports🔥";
+        finalTimetable[period].teacher = "Sports";
         changes.push(
-          `${period.toUpperCase()} Period: ${assignedTeacher} (Absent) → Sports🔥 (No Substitute)`
+          `${period.toUpperCase()} Period: ${assignedTeacher} (Absent) → Sports (No Substitute)`
         );
       }
     }
@@ -155,7 +155,7 @@ export default function TimeTable() {
             let displayTeacher = teacherName;
             let textColor = "text-green-600 font-semibold";
 
-            if (teacherName === "Sports🔥") {
+            if (teacherName === "Sports") {
               textColor = "text-orange-600 font-semibold";
             } else if (Teacher[teacherName]?.status === "absent" && !markSubstitute) {
               displayTeacher += " (Absent)";

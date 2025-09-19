@@ -24,28 +24,28 @@ const LoginPage = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white bg-opacity-15 p-5 rounded-lg">
+            <div className="bg-white bg-opacity-15 p-5 rounded-lg shadow-lg border border-white/20 bg-white/10">
               <div className="flex items-center mb-1">
-                <span className="text-2xl mr-2">::</span>
+                <span className="text-2xl mr-2">⚙️</span>
                 <h3 className="font-medium text-lg">Smart Attendance</h3>
               </div>
               <p className="text-xs opacity-80">QR code, biometric, and face recognition</p>
             </div>
-            <div className="bg-white bg-opacity-15 p-5 rounded-lg">
+            <div className="bg-white/10 bg-opacity-15 p-5 rounded-lg shadow-lg border border-white/20">
               <div className="flex items-center mb-1">
                 <span className="text-2xl mr-2">📊</span>
                 <h3 className="font-medium text-lg">Analytics Dashboard</h3>
               </div>
               <p className="text-xs opacity-80">Real-time insights and performance tracking</p>
             </div>
-            <div className="bg-white bg-opacity-15 p-5 rounded-lg">
+            <div className="bg-white bg-opacity-15 p-5 rounded-lg shadow-lg border border-white/20 bg-white/10">
               <div className="flex items-center mb-1">
                 <span className="text-2xl mr-2">🗓️</span>
                 <h3 className="font-medium text-lg">Dynamic Scheduling</h3>
               </div>
               <p className="text-xs opacity-80">Intelligent timetable adjustments</p>
             </div>
-            <div className="bg-white bg-opacity-15 p-5 rounded-lg">
+            <div className="bg-white bg-opacity-15 p-5 rounded-lg shadow-lg border border-white/20 bg-white/10">
               <div className="flex items-center mb-1">
                 <span className="text-2xl mr-2">🧠</span>
                 <h3 className="font-medium text-lg">Personalized Learning</h3>
@@ -76,7 +76,11 @@ const LoginPage = () => {
               <div className="text-left mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">I am a</label>
                 <select className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
-                  <option>Select your role</option>
+                  <option>Select Your Option</option>
+                  <option>Student</option>
+                  <option>Teacher</option>
+                  <option>Administration</option>
+                  <option>Parent</option>
                 </select>
               </div>
 

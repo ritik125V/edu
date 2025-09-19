@@ -1,18 +1,21 @@
 import { useState } from "react";
-import { CheckCircle, PlayCircle, X } from "lucide-react";
-import { Scanner } from "@yudiel/react-qr-scanner"; // ✅ Correct import
-import { QRCodeCanvas } from "qrcode.react"; // ✅ For student QR codes
+import { CheckCircle, PlayCircle, X, Menu } from "lucide-react"; // ✅ Menu added
+import { Scanner } from "@yudiel/react-qr-scanner";
+import { QRCodeCanvas } from "qrcode.react";
+import { useNavigate } from "react-router";
 
 function TeacherDashboard() {
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAttendancePopup, setShowAttendancePopup] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+
   const [classes, setClasses] = useState([
     { id: 1, subject: "Mathematics", time: "9:00 AM - 9:45 AM", taken: true, className: "Class 10(A)", unit: "Unit 2", topic: "Algebra" },
     { id: 2, subject: "Physics", time: "10:00 AM - 10:45 AM", taken: false, className: "Class 9(B)", unit: "Unit 3", topic: "Laws of Motion" },
     { id: 3, subject: "Chemistry", time: "11:00 AM - 11:45 AM", taken: false, className: "Class 11(C)", unit: "Unit 1", topic: "Organic Chemistry" },
     { id: 4, subject: "Computer Science", time: "1:00 PM - 1:45 PM", taken: false, className: "Class 12(A)", unit: "Unit 5", topic: "Data Structures" },
   ]);
-
-  const [showAttendancePopup, setShowAttendancePopup] = useState(false);
-  const [scannerOpen, setScannerOpen] = useState(false);
 
   const [students, setStudents] = useState([
     { id: 1, name: "Aarav Sharma", present: true },
@@ -43,10 +46,9 @@ function TeacherDashboard() {
     );
   };
 
-  // 🔹 Called when QR code is scanned
   const handleScan = (result) => {
     if (result) {
-      const studentId = parseInt(result, 10); // QR contains student ID
+      const studentId = parseInt(result, 10);
       setStudents((prev) =>
         prev.map((stu) =>
           stu.id === studentId ? { ...stu, present: true } : stu
@@ -72,34 +74,52 @@ function TeacherDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-200 text-gray-900">
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <div className="w-64 bg-gradient-to-b from-indigo-600 to-purple-600 text-white p-6 flex flex-col shadow-xl">
-          <h2 className="text-2xl font-extrabold tracking-wide mb-10">EduSmart</h2>
+      <div className="flex flex-1 flex-col md:flex-row">
+        {/* Sidebar (Desktop only) */}
+        <div className="hidden md:flex w-64 bg-gradient-to-b from-indigo-600 to-purple-600 text-white p-6 flex-col shadow-xl">
+          <h2 className="text-2xl font-extrabold tracking-wide mb-10">EduSync</h2>
           <nav className="flex flex-col gap-4 text-sm font-medium">
-            <button
-              className="text-left hover:text-yellow-300 transition"
-              onClick={() => setShowAttendancePopup(true)}
-            >
-              📋 Take Attendance
-            </button>
-            <button className="text-left hover:text-yellow-300 transition">📝 Take Test</button>
-            <button className="text-left hover:text-yellow-300 transition">❓ Take Quiz</button>
-            <button className="text-left hover:text-yellow-300 transition">📄 Generate Unit Paper</button>
+            <button className="text-left hover:text-yellow-300 transition" onClick={() => navigate("/")}>Home</button>
+            <button className="text-left hover:text-yellow-300 transition" onClick={() => setShowAttendancePopup(true)}>Attendance</button>
+            <button className="text-left hover:text-yellow-300 transition" onClick={() => navigate("/free-period")}>Test</button>
+            <button className="text-left hover:text-yellow-300 transition">Quiz</button>
+            <button className="text-left hover:text-yellow-300 transition">Settings</button>
           </nav>
         </div>
 
         {/* Main Section */}
         <div className="flex-1 flex flex-col">
           {/* Navbar */}
-          <div className="flex justify-between items-center p-4 border-b bg-white/70 backdrop-blur-md shadow-sm">
-            <h1 className="text-xl font-bold">Welcome, {teacherDetails.name} 👨‍🏫</h1>
+          <div className="flex justify-between items-center p-4 border-b 
+            text-black shadow-sm">
+            <h1 className="text-lg sm:text-xl font-bold">
+              Welcome, {teacherDetails.name}
+            </h1>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-white/20"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <Menu size={24} />
+            </button>
           </div>
+
+          {/* Mobile Dropdown Menu */}
+          {isMenuOpen && (
+            <div className="md:hidden bg-gradient-to-b from-indigo-600 to-purple-600 text-white flex flex-col gap-4 p-4 shadow-lg">
+              <button className="text-left hover:text-yellow-300 transition" onClick={() => navigate("/")}>Home</button>
+              <button className="text-left hover:text-yellow-300 transition" onClick={() => setShowAttendancePopup(true)}>Attendance</button>
+              <button className="text-left hover:text-yellow-300 transition" onClick={() => navigate("/free-period")}>Test</button>
+              <button className="text-left hover:text-yellow-300 transition">Quiz</button>
+              <button className="text-left hover:text-yellow-300 transition">Settings</button>
+            </div>
+          )}
 
           {/* Top Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
             {/* Classes Card */}
-            <div className="lg:col-span-1 bg-white/80 backdrop-blur-lg border rounded-2xl p-5 shadow-lg transition hover:shadow-2xl">
+            <div className="lg:col-span-1 bg-white/80 backdrop-blur-lg border rounded-2xl p-5 shadow-lg">
               <h2 className="font-bold text-lg mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Today’s Classes
               </h2>
@@ -134,19 +154,19 @@ function TeacherDashboard() {
             </div>
 
             {/* Teacher Details Card */}
-            <div className="lg:col-span-2 bg-white/80 backdrop-blur-lg border rounded-2xl p-5 shadow-lg transition hover:shadow-2xl">
+            <div className="lg:col-span-2 bg-white/80 backdrop-blur-lg border rounded-2xl p-5 shadow-lg">
               <h2 className="font-bold text-lg mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Teacher Details
               </h2>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <li><span className="font-semibold">👤 Name:</span> {teacherDetails.name}</li>
-                <li><span className="font-semibold">🆔 ID:</span> {teacherDetails.id}</li>
-                <li><span className="font-semibold">🏫 Department:</span> {teacherDetails.department}</li>
-                <li><span className="font-semibold">📧 Email:</span> {teacherDetails.email}</li>
-                <li><span className="font-semibold">📞 Phone:</span> {teacherDetails.phone}</li>
-                <li><span className="font-semibold">📘 Subjects:</span> {teacherDetails.subjects.join(", ")}</li>
-                <li><span className="font-semibold">📊 Total Lectures:</span> {teacherDetails.totalLectures}</li>
-                <li><span className="font-semibold">📅 Lectures This Month:</span> {teacherDetails.lecturesThisMonth}</li>
+                <li><span className="font-semibold">Name:</span> {teacherDetails.name}</li>
+                <li><span className="font-semibold">ID:</span> {teacherDetails.id}</li>
+                <li><span className="font-semibold">Department:</span> {teacherDetails.department}</li>
+                <li><span className="font-semibold">Email:</span> {teacherDetails.email}</li>
+                <li><span className="font-semibold">Phone:</span> {teacherDetails.phone}</li>
+                <li><span className="font-semibold">Subjects:</span> {teacherDetails.subjects.join(", ")}</li>
+                <li><span className="font-semibold">Total Lectures:</span> {teacherDetails.totalLectures}</li>
+                <li><span className="font-semibold">Lectures This Month:</span> {teacherDetails.lecturesThisMonth}</li>
               </ul>
             </div>
           </div>
@@ -156,7 +176,7 @@ function TeacherDashboard() {
             <div className="p-6">
               <div className="bg-white border rounded-2xl shadow-lg p-6">
                 <h2 className="font-bold text-lg text-indigo-700 mb-3">
-                  📘 {activeClass.subject} - {activeClass.className}
+                  {activeClass.subject} - {activeClass.className}
                 </h2>
                 <p className="text-sm text-gray-600 mb-4">
                   <span className="font-semibold">{activeClass.unit}:</span> {activeClass.topic}
@@ -188,7 +208,7 @@ function TeacherDashboard() {
 
           {/* Student QR Codes */}
           <div className="p-6">
-            <h2 className="text-xl font-bold mb-4">📱 Student QR Codes</h2>
+            <h2 className="text-xl font-bold mb-4">Student QR Codes</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {students.map((stu) => (
                 <div
@@ -209,7 +229,6 @@ function TeacherDashboard() {
       {showAttendancePopup && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-[500px] relative">
-            {/* Close */}
             <button
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
               onClick={() => { setShowAttendancePopup(false); setScannerOpen(false); }}
@@ -219,16 +238,16 @@ function TeacherDashboard() {
 
             <h2 className="text-xl font-bold mb-4 text-indigo-700">Take Attendance</h2>
 
-            <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-1">
               {!scannerOpen ? (
                 <button
                   onClick={() => setScannerOpen(true)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-semibold transition"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1 rounded-lg font-semibold transition"
                 >
-                  📷 Open Scanner
+                  Open Scanner
                 </button>
               ) : (
-                <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-2">
                   <Scanner
                     onDecode={handleScan}
                     onError={(error) => console.error(error)}
@@ -243,9 +262,10 @@ function TeacherDashboard() {
                   </button>
                 </div>
               )}
-
-              <p className="text-lg font-semibold text-gray-800 text-center mt-4">
-                📡 Scan student QR card to mark attendance
+              <br />
+              <p className="font-semibold">OR</p>
+              <p className="text-lg font-bold  text-gray-800 text-center mt-1">
+                Touch Your Device on Student ID to mark attendance
               </p>
             </div>
           </div>
