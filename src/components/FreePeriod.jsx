@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Loader2, BookOpen, Sparkles } from "lucide-react";
 
 // Initialize AI client
-const ai = new GoogleGenerativeAI("AIzaSyCIYFt_S2WTFGZ9ppml9y4KJH3ZEeoMdTM");
 
 export default function FreePeriod() {
   const [subject, setSubject] = useState("Maths");
