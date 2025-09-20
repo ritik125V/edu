@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Loader2, BookOpen, Sparkles } from "lucide-react";
 
 // Initialize AI client
@@ -11,13 +11,13 @@ export default function FreePeriod() {
   const [loading, setLoading] = useState(false);
   const [assignment, setAssignment] = useState("");
 
-  const generateAssignment = async () => {
-    setLoading(true);
-    setAssignment("");
-    setAssignment("https://www.instagram.com/reel/C6LjSpxBBC0/")
+  // const generateAssignment = async () => {
+  //   setLoading(true);
+  //   setAssignment("");
+  //   setAssignment("https://www.instagram.com/reel/C6LjSpxBBC0/")
 
-    setLoading(false);
-  };
+  //   setLoading(false);
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white p-6">
