@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { CheckCircle, PlayCircle, X, Menu } from "lucide-react";
-import { QrReader } from "react-qr-reader";
-import { QRCodeCanvas } from "qrcode.react";
+
 import { useNavigate } from "react-router";
 
 function TeacherDashboard() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAttendancePopup, setShowAttendancePopup] = useState(false);
-  const [scannerOpen, setScannerOpen] = useState(false);
-  const [scannedStudent, setScannedStudent] = useState(null);
+
 
   const [classes, setClasses] = useState([
     { id: 1, subject: "Mathematics", time: "9:00 AM - 9:45 AM", taken: true, className: "Class 10(A)", unit: "Unit 2", topic: "Algebra" },
@@ -47,23 +45,7 @@ function TeacherDashboard() {
     );
   };
 
-  const handleScan = (result) => {
-    if (!result) return;
-    const studentId = parseInt(result, 10);
-    if (isNaN(studentId)) {
-      console.error("Invalid QR code scanned");
-      return;
-    }
 
-    setStudents((prev) => {
-      const updated = prev.map((stu) =>
-        stu.id === studentId ? { ...stu, present: true } : stu
-      );
-      const foundStudent = updated.find((stu) => stu.id === studentId);
-      setScannedStudent(foundStudent || { id: studentId, name: "Unknown", present: true });
-      return updated;
-    });
-  };
 
   const teacherDetails = {
     name: "Prof. Anil Kumar",
@@ -182,73 +164,11 @@ function TeacherDashboard() {
             </div>
           )}
 
-          {/* QR Codes */}
-          <div className="p-6">
-            <h2 className="text-xl font-bold mb-4">Student QR Codes</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {students.map((stu) => (
-                <div key={stu.id} className="flex flex-col items-center bg-white p-4 rounded-xl shadow-md">
-                  <QRCodeCanvas value={String(stu.id)} size={120} />
-                  <p className="mt-2 text-sm font-semibold">{stu.name}</p>
-                  <p className="text-xs text-gray-500">ID: {stu.id}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+
         </div>
       </div>
 
-      {/* Attendance Popup */}
-      {showAttendancePopup && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 w-[500px] relative">
-            <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-800" onClick={() => { setShowAttendancePopup(false); setScannerOpen(false); setScannedStudent(null); }}>
-              <X size={20} />
-            </button>
 
-            <h2 className="text-xl font-bold mb-4 text-indigo-700">Take Attendance</h2>
-
-            <div className="flex flex-col items-center gap-1">
-              {!scannerOpen ? (
-                <button onClick={() => setScannerOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1 rounded-lg font-semibold transition">
-                  Open Scanner
-                </button>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <div style={{ width: "250px" }}>
-                    <QrReader
-                      constraints={{ facingMode: "environment" }}
-                      onResult={(result, error) => {
-                        if (!!result) handleScan(result);
-                        if (!!error) console.error(error);
-                      }}
-                      style={{ width: "100%" }}
-                    />
-                  </div>
-                  <button onClick={() => setScannerOpen(false)} className="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-lg">
-                    Close Scanner
-                  </button>
-                </div>
-              )}
-
-              {scannedStudent && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center w-full">
-                  <h3 className="font-bold text-green-700 mb-1">Scanned Student Details</h3>
-                  <p><span className="font-semibold">Name:</span> {scannedStudent.name}</p>
-                  <p><span className="font-semibold">ID:</span> {scannedStudent.id}</p>
-                  <p><span className="font-semibold">Status:</span> Present</p>
-                  <button onClick={() => setScannedStudent(null)} className="mt-2 bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-lg text-sm">
-                    Clear Details
-                  </button>
-                </div>
-              )}
-
-              <p className="font-semibold mt-2">OR</p>
-              <p className="text-lg font-bold text-gray-800 text-center mt-1">Touch Your Device on Student ID to mark attendance</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
