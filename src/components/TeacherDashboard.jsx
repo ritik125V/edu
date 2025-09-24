@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { CheckCircle, PlayCircle, X, Menu } from "lucide-react";
-
+import { CheckCircle, PlayCircle, X, Menu } from "lucide-react"; 
+import { Scanner } from "@yudiel/react-qr-scanner";
+import { QRCodeCanvas } from "qrcode.react";
 import { useNavigate } from "react-router";
 
 function TeacherDashboard() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAttendancePopup, setShowAttendancePopup] = useState(false);
-
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const [classes, setClasses] = useState([
     { id: 1, subject: "Mathematics", time: "9:00 AM - 9:45 AM", taken: true, className: "Class 10(A)", unit: "Unit 2", topic: "Algebra" },
@@ -17,18 +18,18 @@ function TeacherDashboard() {
   ]);
 
   const [students, setStudents] = useState([
-    { id: 1, name: "Aarav Sharma", present: true },
-    { id: 2, name: "Ishita Verma", present: true },
-    { id: 3, name: "Rohan Gupta", present: false },
-    { id: 4, name: "Kavya Nair", present: true },
-    { id: 5, name: "Devansh Singh", present: true },
-    { id: 6, name: "Meera Patel", present: true },
-    { id: 7, name: "Yash Raj", present: false },
-    { id: 8, name: "Ananya Mishra", present: true },
-    { id: 9, name: "Krishna Das", present: true },
-    { id: 10, name: "Sanya Kapoor", present: true },
-    { id: 11, name: "Aditya Joshi", present: true },
-    { id: 12, name: "Ritika Mehta", present: false },
+    { id: 1, enrollment: "2025CS101", name: "Aarav Sharma", present: true },
+    { id: 2, enrollment: "2025CS102", name: "Ishita Verma", present: true },
+    { id: 3, enrollment: "2025CS103", name: "Rohan Gupta", present: false },
+    { id: 4, enrollment: "2025CS104", name: "Kavya Nair", present: true },
+    { id: 5, enrollment: "2025CS105", name: "Devansh Singh", present: true },
+    { id: 6, enrollment: "2025CS106", name: "Meera Patel", present: true },
+    { id: 7, enrollment: "2025CS107", name: "Yash Raj", present: false },
+    { id: 8, enrollment: "2025CS108", name: "Ananya Mishra", present: true },
+    { id: 9, enrollment: "2025CS109", name: "Krishna Das", present: true },
+    { id: 10, enrollment: "2025CS110", name: "Sanya Kapoor", present: true },
+    { id: 11, enrollment: "2025CS111", name: "Aditya Joshi", present: true },
+    { id: 12, enrollment: "2025CS112", name: "Ritika Mehta", present: false },
   ]);
 
   const markClassTaken = (id) => {
@@ -45,7 +46,55 @@ function TeacherDashboard() {
     );
   };
 
+  // ✅ QR Scan Attendance
+  const handleScan = (result) => {
+    if (result) {
+      const scanned = result.trim();
+      setStudents((prev) =>
+        prev.map((stu) =>
+          stu.id === parseInt(scanned, 10) || stu.enrollment === scanned
+            ? { ...stu, present: true }
+            : stu
+        )
+      );
+      alert(`✅ Attendance marked for: ${scanned}`);
+      setScannerOpen(false);
+    }
+  };
 
+  // ✅ NFC Attendance
+  const handleNFC = async () => {
+    if ("NDEFReader" in window) {
+      try {
+        const reader = new NDEFReader();
+        await reader.scan();
+        console.log("📡 NFC Scan started...");
+
+        reader.onreading = (event) => {
+          const decoder = new TextDecoder();
+          for (const record of event.message.records) {
+            const scanned = decoder.decode(record.data).trim();
+            console.log("NFC Enrollment:", scanned);
+
+            setStudents((prev) =>
+              prev.map((stu) =>
+                stu.id === parseInt(scanned, 10) || stu.enrollment === scanned
+                  ? { ...stu, present: true }
+                  : stu
+              )
+            );
+
+            alert(`✅ Attendance marked via NFC for: ${scanned}`);
+          }
+        };
+      } catch (error) {
+        console.error("❌ NFC scan failed:", error);
+        alert("NFC scan failed. Make sure NFC is enabled.");
+      }
+    } else {
+      alert("⚠️ NFC not supported on this device/browser.");
+    }
+  };
 
   const teacherDetails = {
     name: "Prof. Anil Kumar",
@@ -79,13 +128,18 @@ function TeacherDashboard() {
         <div className="flex-1 flex flex-col">
           {/* Navbar */}
           <div className="flex justify-between items-center p-4 border-b text-black shadow-sm">
-            <h1 className="text-lg sm:text-xl font-bold">Welcome, {teacherDetails.name}</h1>
-            <button className="md:hidden p-2 rounded-lg hover:bg-white/20" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <h1 className="text-lg sm:text-xl font-bold">
+              Welcome, {teacherDetails.name}
+            </h1>
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-white/20"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
               <Menu size={24} />
             </button>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Dropdown Menu */}
           {isMenuOpen && (
             <div className="md:hidden bg-gradient-to-b from-indigo-600 to-purple-600 text-white flex flex-col gap-4 p-4 shadow-lg">
               <button className="text-left hover:text-yellow-300 transition" onClick={() => navigate("/")}>Home</button>
@@ -96,15 +150,19 @@ function TeacherDashboard() {
             </div>
           )}
 
-          {/* Classes & Teacher Details */}
+          {/* Top Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+            {/* Classes Card */}
             <div className="lg:col-span-1 bg-white/80 backdrop-blur-lg border rounded-2xl p-5 shadow-lg">
               <h2 className="font-bold text-lg mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Today’s Classes
               </h2>
               <div className="space-y-4">
                 {classes.map((cls) => (
-                  <div key={cls.id} className="flex flex-col gap-1 bg-gray-50 rounded-xl p-3 shadow-sm hover:bg-gray-100 transition">
+                  <div
+                    key={cls.id}
+                    className="flex flex-col gap-1 bg-gray-50 rounded-xl p-3 shadow-sm hover:bg-gray-100 transition"
+                  >
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="font-semibold">{cls.subject} - {cls.className}</p>
@@ -116,7 +174,10 @@ function TeacherDashboard() {
                           <CheckCircle size={18} /> Taken
                         </span>
                       ) : (
-                        <button onClick={() => markClassTaken(cls.id)} className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-sm transition">
+                        <button
+                          onClick={() => markClassTaken(cls.id)}
+                          className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-sm transition"
+                        >
                           <PlayCircle size={18} /> Start
                         </button>
                       )}
@@ -126,6 +187,7 @@ function TeacherDashboard() {
               </div>
             </div>
 
+            {/* Teacher Details Card */}
             <div className="lg:col-span-2 bg-white/80 backdrop-blur-lg border rounded-2xl p-5 shadow-lg">
               <h2 className="font-bold text-lg mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Teacher Details
@@ -143,18 +205,32 @@ function TeacherDashboard() {
             </div>
           </div>
 
-          {/* Active Class */}
+          {/* Active Class Details */}
           {activeClass && (
             <div className="p-6">
               <div className="bg-white border rounded-2xl shadow-lg p-6">
-                <h2 className="font-bold text-lg text-indigo-700 mb-3">{activeClass.subject} - {activeClass.className}</h2>
-                <p className="text-sm text-gray-600 mb-4"><span className="font-semibold">{activeClass.unit}:</span> {activeClass.topic}</p>
+                <h2 className="font-bold text-lg text-indigo-700 mb-3">
+                  {activeClass.subject} - {activeClass.className}
+                </h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  <span className="font-semibold">{activeClass.unit}:</span> {activeClass.topic}
+                </p>
                 <h3 className="font-semibold mb-2">Student List</h3>
                 <div className="space-y-2">
                   {students.map((stu) => (
-                    <div key={stu.id} className="flex justify-between items-center bg-gray-50 p-2 rounded-lg shadow-sm">
-                      <span>{stu.name}</span>
-                      <button onClick={() => toggleAttendance(stu.id)} className={`px-3 py-1 rounded-lg text-sm font-medium ${stu.present ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-red-100 text-red-700 hover:bg-red-200"}`}>
+                    <div
+                      key={stu.id}
+                      className="flex justify-between items-center bg-gray-50 p-2 rounded-lg shadow-sm"
+                    >
+                      <span>{stu.name} ({stu.enrollment})</span>
+                      <button
+                        onClick={() => toggleAttendance(stu.id)}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                          stu.present
+                            ? "bg-green-100 text-green-700 hover:bg-green-200"
+                            : "bg-red-100 text-red-700 hover:bg-red-200"
+                        }`}
+                      >
                         {stu.present ? "Present" : "Absent"}
                       </button>
                     </div>
@@ -164,11 +240,75 @@ function TeacherDashboard() {
             </div>
           )}
 
-
+          {/* Student QR Codes */}
+          <div className="p-6">
+            <h2 className="text-xl font-bold mb-4">Student QR Codes</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {students.map((stu) => (
+                <div
+                  key={stu.id}
+                  className="flex flex-col items-center bg-white p-4 rounded-xl shadow-md"
+                >
+                  <QRCodeCanvas value={stu.enrollment} size={120} />
+                  <p className="mt-2 text-sm font-semibold">{stu.name}</p>
+                  <p className="text-xs text-gray-500">{stu.enrollment}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Attendance Popup */}
+      {showAttendancePopup && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-[500px] relative">
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+              onClick={() => { setShowAttendancePopup(false); setScannerOpen(false); }}
+            >
+              <X size={20} />
+            </button>
 
+            <h2 className="text-xl font-bold mb-4 text-indigo-700">Take Attendance</h2>
+
+            <div className="flex flex-col items-center gap-2">
+              {!scannerOpen ? (
+                <button
+                  onClick={() => setScannerOpen(true)}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1 rounded-lg font-semibold transition"
+                >
+                  Open QR Scanner
+                </button>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <Scanner
+                    onDecode={handleScan}
+                    onError={(error) => console.error(error)}
+                    constraints={{ facingMode: "environment" }}
+                    style={{ width: "250px" }}
+                  />
+                  <button
+                    onClick={() => setScannerOpen(false)}
+                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-lg"
+                  >
+                    Close Scanner
+                  </button>
+                </div>
+              )}
+
+              <p className="font-semibold mt-4">OR</p>
+
+              <button
+                onClick={handleNFC}
+                className="bg-green-600 hover:bg-green-700 text-white px-5 py-1 rounded-lg font-semibold transition"
+              >
+                Scan NFC Tag
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
