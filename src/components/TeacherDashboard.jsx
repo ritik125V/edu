@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { CheckCircle, PlayCircle, X, Menu } from "lucide-react"; 
-import { Scanner } from "@yudiel/react-qr-scanner";
+import { CheckCircle, PlayCircle, Menu } from "lucide-react"; 
 import { QRCodeCanvas } from "qrcode.react";
 import { useNavigate } from "react-router";
+import AttendancePopup from "../components/AttendancePopup"; // ✅ your component
 
 function TeacherDashboard() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAttendancePopup, setShowAttendancePopup] = useState(false);
-  const [scannerOpen, setScannerOpen] = useState(false);
 
   const [classes, setClasses] = useState([
     { id: 1, subject: "Mathematics", time: "9:00 AM - 9:45 AM", taken: true, className: "Class 10(A)", unit: "Unit 2", topic: "Algebra" },
@@ -44,56 +43,6 @@ function TeacherDashboard() {
         stu.id === id ? { ...stu, present: !stu.present } : stu
       )
     );
-  };
-
-  // ✅ QR Scan Attendance
-  const handleScan = (result) => {
-    if (result) {
-      const scanned = result.trim();
-      setStudents((prev) =>
-        prev.map((stu) =>
-          stu.id === parseInt(scanned, 10) || stu.enrollment === scanned
-            ? { ...stu, present: true }
-            : stu
-        )
-      );
-      alert(`✅ Attendance marked for: ${scanned}`);
-      setScannerOpen(false);
-    }
-  };
-
-  // ✅ NFC Attendance
-  const handleNFC = async () => {
-    if ("NDEFReader" in window) {
-      try {
-        const reader = new NDEFReader();
-        await reader.scan();
-        console.log("📡 NFC Scan started...");
-
-        reader.onreading = (event) => {
-          const decoder = new TextDecoder();
-          for (const record of event.message.records) {
-            const scanned = decoder.decode(record.data).trim();
-            console.log("NFC Enrollment:", scanned);
-
-            setStudents((prev) =>
-              prev.map((stu) =>
-                stu.id === parseInt(scanned, 10) || stu.enrollment === scanned
-                  ? { ...stu, present: true }
-                  : stu
-              )
-            );
-
-            alert(`✅ Attendance marked via NFC for: ${scanned}`);
-          }
-        };
-      } catch (error) {
-        console.error("❌ NFC scan failed:", error);
-        alert("NFC scan failed. Make sure NFC is enabled.");
-      }
-    } else {
-      alert("⚠️ NFC not supported on this device/browser.");
-    }
   };
 
   const teacherDetails = {
@@ -256,58 +205,17 @@ function TeacherDashboard() {
               ))}
             </div>
           </div>
+
         </div>
       </div>
 
       {/* Attendance Popup */}
       {showAttendancePopup && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 w-[500px] relative">
-            <button
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-              onClick={() => { setShowAttendancePopup(false); setScannerOpen(false); }}
-            >
-              <X size={20} />
-            </button>
-
-            <h2 className="text-xl font-bold mb-4 text-indigo-700">Take Attendance</h2>
-
-            <div className="flex flex-col items-center gap-2">
-              {!scannerOpen ? (
-                <button
-                  onClick={() => setScannerOpen(true)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1 rounded-lg font-semibold transition"
-                >
-                  Open QR Scanner
-                </button>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <Scanner
-                    onDecode={handleScan}
-                    onError={(error) => console.error(error)}
-                    constraints={{ facingMode: "environment" }}
-                    style={{ width: "250px" }}
-                  />
-                  <button
-                    onClick={() => setScannerOpen(false)}
-                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-lg"
-                  >
-                    Close Scanner
-                  </button>
-                </div>
-              )}
-
-              <p className="font-semibold mt-4">OR</p>
-
-              <button
-                onClick={handleNFC}
-                className="bg-green-600 hover:bg-green-700 text-white px-5 py-1 rounded-lg font-semibold transition"
-              >
-                Scan NFC Tag
-              </button>
-            </div>
-          </div>
-        </div>
+        <AttendancePopup
+          students={students}
+          setStudents={setStudents}
+          onClose={() => setShowAttendancePopup(false)}
+        />
       )}
     </div>
   );
