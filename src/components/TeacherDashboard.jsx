@@ -322,17 +322,22 @@ function TeacherDashboard() {
             <div>
               <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
                 <div className="bg-white rounded-2xl shadow-2xl p-6 w-[400px] relative">
-                  
-
                   <h2 className="text-xl font-bold mb-4 text-indigo-700">Student Details</h2>
-
                   <div className="flex flex-col gap-2">
-                    <p className="font-semibold">Name: {NfcScanned}</p>
+                    <p className="text-xs">Nfc info : {NfcScanned}</p>
+                    {
+                      students.filter(stu => stu.enrollment === NfcScanned || stu.id === parseInt(NfcScanned, 10)).map(stu => (
+                        <div key={stu.id} className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                          <p><span className="font-semibold">ID:</span> {stu.id}</p>
+                          <p><span className="font-semibold">Name:</span> {stu.name}</p>
+                          <p><span className="font-semibold">Enrollment:</span> {stu.enrollment}</p>
+                        </div>
+                      ))}
                     <button
-                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                    className="absolute top-3 right-3 text-white bg-green-500 active:scale-95 hover:bg-green-600 px-3 py-1 rounded-lg"
                     onClick={() => { setStudentPopUp(false); setNfcScanned(null); }}
                   >
-                    <X size={20} />
+                    Mark Present
                   </button>
                   </div>
                 </div>
