@@ -12,6 +12,7 @@ function TeacherDashboard() {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [NfcScanned, setNfcScanned] = useState(null);
   const [StudentPopUp, setStudentPopUp] = useState(false);
+  const [NfcScanning , setNfcScanning] = useState(false);
 
   const [classes, setClasses] = useState([
     { id: 1, subject: "Mathematics", time: "9:00 AM - 9:45 AM", taken: true, className: "Class 10(A)", unit: "Unit 2", topic: "Algebra" },
@@ -21,17 +22,17 @@ function TeacherDashboard() {
   ]);
 
   const [students, setStudents] = useState([
-    { id: 1, enrollment: "03114802824", name: "Ritik verma", present: true },
-    { id: 2, enrollment: "2025CS102", name: "Ishita Verma", present: true },
+    { id: 1, enrollment: "03114802824", name: "Ritik verma", present: false },
+    { id: 2, enrollment: "2025CS102", name: "Ishita Verma", present: false },
     { id: 3, enrollment: "2025CS103", name: "Rohan Gupta", present: false },
-    { id: 4, enrollment: "2025CS104", name: "Kavya Nair", present: true },
-    { id: 5, enrollment: "2025CS105", name: "Devansh Singh", present: true },
-    { id: 6, enrollment: "2025CS106", name: "Meera Patel", present: true },
+    { id: 4, enrollment: "2025CS104", name: "Kavya Nair", present: false },
+    { id: 5, enrollment: "2025CS105", name: "Devansh Singh", present: false },
+    { id: 6, enrollment: "2025CS106", name: "Meera Patel", present: false },
     { id: 7, enrollment: "2025CS107", name: "Yash Raj", present: false },
-    { id: 8, enrollment: "2025CS108", name: "Ananya Mishra", present: true },
-    { id: 9, enrollment: "2025CS109", name: "Krishna Das", present: true },
-    { id: 10, enrollment: "2025CS110", name: "Sanya Kapoor", present: true },
-    { id: 11, enrollment: "2025CS111", name: "Aditya Joshi", present: true },
+    { id: 8, enrollment: "2025CS108", name: "Ananya Mishra", present: false },
+    { id: 9, enrollment: "2025CS109", name: "Krishna Das", present: false },
+    { id: 10, enrollment: "2025CS110", name: "Sanya Kapoor", present: false },
+    { id: 11, enrollment: "2025CS111", name: "Aditya Joshi", present: false },
     { id: 12, enrollment: "2025CS112", name: "Ritika Mehta", present: false },
   ]);
 
@@ -48,6 +49,9 @@ function TeacherDashboard() {
       )
     );
   };
+  function markPresent(id){
+    students.filter(student=> student.id === id ? {...student, present: true} : student)
+  }
 
   // ✅ QR Scan Attendance
   const handleScan = (result) => {
@@ -69,6 +73,7 @@ function TeacherDashboard() {
   // ✅ NFC Attendance
   const handleNFC = async () => {
     if ("NDEFReader" in window) {
+      setNfcScanning(true);
       try {
         const reader = new NDEFReader();
         await reader.scan();
@@ -90,6 +95,7 @@ function TeacherDashboard() {
             toast.success(`✅ Attendance scanned for: ${scanned}`)
             setStudentPopUp(true);
             setNfcScanned(scanned);
+            setNfcScanning(false);
           }
         };
       } catch (error) {
@@ -311,7 +317,7 @@ function TeacherDashboard() {
                 onClick={handleNFC}
                 className="bg-green-600 hover:bg-green-700 text-white px-5 py-1 rounded-lg font-semibold transition"
               >
-                Scan NFC Tag
+                {NfcScanning ? "Scanning NFC..." : "Scan via NFC"}
               </button>
             </div>
           </div>
@@ -335,7 +341,8 @@ function TeacherDashboard() {
                       ))}
                     <button
                     className="absolute top-3 right-3 text-white bg-green-500 active:scale-95 hover:bg-green-600 px-3 py-1 rounded-lg"
-                    onClick={() => { setStudentPopUp(false); setNfcScanned(null); }}
+                    onClick={() => { setStudentPopUp(false); setNfcScanned(null); markPresent(NfcScanned); }}
+                    
                   >
                     Mark Present
                   </button>
