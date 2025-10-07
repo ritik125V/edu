@@ -3,12 +3,15 @@ import { CheckCircle, PlayCircle, X, Menu } from "lucide-react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { QRCodeCanvas } from "qrcode.react";
 import { useNavigate } from "react-router";
+import { ToastContainer, toast } from 'react-toastify';
 
 function TeacherDashboard() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAttendancePopup, setShowAttendancePopup] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [NfcScanned, setNfcScanned] = useState(null);
+  const [StudentPopUp, setStudentPopUp] = useState(false);
 
   const [classes, setClasses] = useState([
     { id: 1, subject: "Mathematics", time: "9:00 AM - 9:45 AM", taken: true, className: "Class 10(A)", unit: "Unit 2", topic: "Algebra" },
@@ -18,7 +21,7 @@ function TeacherDashboard() {
   ]);
 
   const [students, setStudents] = useState([
-    { id: 1, enrollment: "2025CS101", name: "Aarav Sharma", present: true },
+    { id: 1, enrollment: "03114802824", name: "Ritik verma", present: true },
     { id: 2, enrollment: "2025CS102", name: "Ishita Verma", present: true },
     { id: 3, enrollment: "2025CS103", name: "Rohan Gupta", present: false },
     { id: 4, enrollment: "2025CS104", name: "Kavya Nair", present: true },
@@ -57,8 +60,9 @@ function TeacherDashboard() {
             : stu
         )
       );
+      setNfcScanned(scanned);
       alert(`✅ Attendance marked for: ${scanned}`);
-      setScannerOpen(false);
+      
     }
   };
 
@@ -83,8 +87,9 @@ function TeacherDashboard() {
                   : stu
               )
             );
-
-            alert(`✅ Attendance marked via NFC for: ${scanned}`);
+            toast.success(`✅ Attendance scanned for: ${scanned}`)
+            setStudentPopUp(true);
+            setNfcScanned(scanned);
           }
         };
       } catch (error) {
@@ -110,8 +115,11 @@ function TeacherDashboard() {
   const activeClass = classes.find((cls) => cls.taken);
 
   return (
+    
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-200 text-gray-900">
+      <ToastContainer />
       <div className="flex flex-1 flex-col md:flex-row">
+
         {/* Sidebar */}
         <div className="hidden md:flex w-64 bg-gradient-to-b from-indigo-600 to-purple-600 text-white p-6 flex-col shadow-xl">
           <h2 className="text-2xl font-extrabold tracking-wide mb-10">EduSync</h2>
@@ -309,6 +317,29 @@ function TeacherDashboard() {
           </div>
         </div>
       )}
+      {
+          StudentPopUp && 
+            <div>
+              <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                <div className="bg-white rounded-2xl shadow-2xl p-6 w-[400px] relative">
+                  
+
+                  <h2 className="text-xl font-bold mb-4 text-indigo-700">Student Details</h2>
+
+                  <div className="flex flex-col gap-2">
+                    <p className="font-semibold">Name: {NfcScanned}</p>
+                    <button
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                    onClick={() => { setStudentPopUp(false); setNfcScanned(null); }}
+                  >
+                    <X size={20} />
+                  </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+        }
     </div>
   );
 }
